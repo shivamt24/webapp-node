@@ -1,0 +1,34 @@
+{
+  "name": "webapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-shivamt24:shivamt24/webapp.git"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "http-status": "^1.6.2",
+    "joi": "^17.7.0",
+    "lodash": "^4.17.21",
+    "nodemon": "^2.0.20",
+    "pg": "^8.0.3",
+    "postgres-pool": "^6.0.8",
+    "save-dev": "^0.0.1-security"
+  },
+  "devDependencies": {
+    "jest": "^29.4.1",
+    "ts-jest": "^29.0.5"
+  }
+}
