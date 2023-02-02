@@ -11,7 +11,7 @@ const createUser = {
         first_name: Joi.string().required(),
         last_name: Joi.string().required(),
         username: Joi.string().email().lowercase().required(),
-        password: Joi.string().min(5).required().strict(),
+        password: Joi.string().required().strict(),
     }),
 }
 
