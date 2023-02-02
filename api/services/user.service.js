@@ -17,8 +17,6 @@ const createUser = async (userInfo) => {
     }
 
     let pass = await bcrypt.hash(userInfo.password, 10);
-    //let passCheck = await bcrypt.compare(userInfo.password, pass);
-    //console.log(passCheck);
     const result = await db.query(`INSERT INTO users(first_name, last_name, username, password) values ('${userInfo.first_name}', '${userInfo.last_name}', '${userInfo.username}', '${pass}') returning id, first_name, last_name, username, account_created, account_updated`);
 
     return result.rows[0];
