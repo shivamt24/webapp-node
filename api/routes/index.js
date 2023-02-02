@@ -2,7 +2,7 @@ import UserRoute from './user.route.js';
 
 
 const appRoutes = [{
-    path: '/vi/user',
+    path: '/v1/user',
     route: UserRoute,
 }, ];
 

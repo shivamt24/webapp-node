@@ -1,7 +1,8 @@
 import app from './api/app.js';
 import centralErrorHandler from './api/utils/centralErrorHandler.js';
-
-const port = 8080;
+import * as dotenv from 'dotenv';
+dotenv.config();
+const port = process.env.SERVERPORT;
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`)
