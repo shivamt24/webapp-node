@@ -6,7 +6,7 @@
 
 **NUID**: 002765286
 
-# Node Project with PostgreSQL Database
+# Node Project with PostgreSQL Database.
 
 ## Introduction
 This is a Node.js project that uses a PostgreSQL database for data storage and retrieval. The project is built with [Express](https://expressjs.com/), a popular web application framework for Node.js.
