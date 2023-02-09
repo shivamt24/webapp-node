@@ -1,12 +1,24 @@
 import app from './api/app.js';
 import centralErrorHandler from './api/utils/centralErrorHandler.js';
 import * as dotenv from 'dotenv';
+import models, {
+    sequelize
+} from './api/models/index.js';
+
 dotenv.config();
 const port = process.env.SERVERPORT;
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`)
 });
+
+sequelize.sync()
+    .then(() => {
+        console.log("Synced db.");
+    })
+    .catch((err) => {
+        console.log("Failed to sync db: " + err.message);
+    });
 
 // Centralized error handler
 app.use((err, req, res, next) => {
