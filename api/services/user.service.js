@@ -3,48 +3,83 @@ import _ from 'lodash';
 import db from '../database/index.js';
 import bcrypt from 'bcrypt';
 import AppError from '../utils/AppError.js';
+import models from '../models/index.js';
+const User = models.User;
 
 const createUser = async (userInfo) => {
-
     if (_.isEmpty(userInfo)) {
         throw new AppError(httpStatus.NO_CONTENT, `Error: No content provided to update`);
     }
+    const userCheck = await User.findAll({
+        where: {
+            username: userInfo.username
+        }
+    });
 
-    const userCheck = await db.query(`SELECT * FROM users where username= '${userInfo.username}'`);
-
-    if (userCheck.rowCount !== 0) {
+    if (userCheck.length > 0) {
         throw new AppError(httpStatus.BAD_REQUEST, `Error: The username: ${userInfo.username} is not unique`);
     }
 
     let pass = await bcrypt.hash(userInfo.password, 10);
-    const result = await db.query(`INSERT INTO users(first_name, last_name, username, password) values ('${userInfo.first_name}', '${userInfo.last_name}', '${userInfo.username}', '${pass}') returning id, first_name, last_name, username, account_created, account_updated`);
+    const result = await User.create({
+        first_name: userInfo.first_name,
+        last_name: userInfo.last_name,
+        username: userInfo.username,
+        password: pass,
+    });
+    delete result.dataValues.password;
+    return result.dataValues;
 
-    return result.rows[0];
+    // if (_.isEmpty(userInfo)) {
+    //     throw new AppError(httpStatus.NO_CONTENT, `Error: No content provided to update`);
+    // }
+
+    //const userCheck = await db.query(`SELECT * FROM users where username= '${userInfo.username}'`);
+
+    // if (userCheck.rowCount !== 0) {
+    //     throw new AppError(httpStatus.BAD_REQUEST, `Error: The username: ${userInfo.username} is not unique`);
+    // }
+
+    //let pass = await bcrypt.hash(userInfo.password, 10);
+    //const result = await db.query(`INSERT INTO users(first_name, last_name, username, password) values ('${userInfo.first_name}', '${userInfo.last_name}', '${userInfo.username}', '${pass}') returning id, first_name, last_name, username, account_created, account_updated`);
+
+    //return result.rows[0];
 };
 
 const fetchUserById = async (_id, _authUser) => {
-    console.log("fetchUser called");
-    if (_id === _authUser.rows[0].id) {
-        const result = await db.query(`SELECT id, first_name, last_name, username, account_created, account_updated FROM users where id=${_id}`);
-        console.log(result);
-        return result.rows[0];
+
+    if (+_id === +_authUser[0].dataValues.id) {
+        const result = await User.findAll({
+            attributes: {
+                exclude: ['password']
+            },
+            where: {
+                id: _id
+            }
+        });
+        return result[0].dataValues;
     } else {
         throw new AppError(httpStatus.FORBIDDEN, `Error: The User is forbidden to access ID: ${_id}`);
     }
 
+    // if (_id === _authUser.rows[0].id) {
+    //     const result = await db.query(`SELECT id, first_name, last_name, username, account_created, account_updated FROM users where id=${_id}`);
+    //     console.log(result);
+    //     return result.rows[0];
+    // } else {
+    //     throw new AppError(httpStatus.FORBIDDEN, `Error: The User is forbidden to access ID: ${_id}`);
+    // }
+
 };
 
 const updateUser = async (_id, _authUser, userInfo) => {
-    if (_id === _authUser.rows[0].id) {
+    //_authUser.rows[0].id
+    if (+_id === +_authUser[0].dataValues.id) {
         if (_.isEmpty(userInfo)) {
             throw new AppError(httpStatus.NO_CONTENT, `Error: No content provided to update`);
         }
-        if (userInfo.username) {
-            const userCheck = await db.query(`SELECT id FROM users where username= '${userInfo.username}'`);
-
-            if (userCheck.rowCount !== 0 && userCheck.rows[0].id !== _authUser.rows[0].id) {
-                throw new AppError(httpStatus.BAD_REQUEST, `Error: The username: ${userInfo.username} is not unique`);
-            }
+        if (userInfo.username !== _authUser[0].dataValues.username) {
+            throw new AppError(httpStatus.BAD_REQUEST, `Error: The username cannot be modified`);
         }
         if (userInfo.password) {
             userInfo.password = await bcrypt.hash(userInfo.password, 10);

@@ -13,6 +13,43 @@ CREATE TABLE users(
 
 );
 
+CREATE TABLE products (
+	id bigserial NOT NULL PRIMARY KEY,
+	name varchar(30) NOT NULL,
+	description varchar(30) NOT NULL,
+	sku varchar(30) NOT NULL,
+    manufacturer varchar(30) NOT NULL,
+    quantity SMALLINT NOT NULL CHECK (pages > 0),
+	date_added timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	date_last_updated timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    owner_user_id BIGSERIAL NOT NULL
+
+);
+
+ALTER TABLE products
+ADD COLUMN owner_user_id BIGSERIAL NOT NULL;
+
+
+CREATE TABLE usertest(
+    title VARCHAR(30) NOT NULL,
+    description VARCHAR(30) NOT NULL,
+    published VARCHAR(30) NOT NULL
+);
+
+CREATE FUNCTION update_updated_on_product_task()
+RETURNS TRIGGER AS $$
+BEGIN
+NEW.date_last_updated = now();
+RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_updated_on_product_task
+BEFORE UPDATE
+ON
+products
+FOR EACH ROW
+EXECUTE PROCEDURE update_updated_on_product_task();
 
 CREATE FUNCTION update_updated_on_user_task()
 RETURNS TRIGGER AS $$
@@ -31,3 +68,27 @@ FOR EACH ROW
 EXECUTE PROCEDURE update_updated_on_user_task();
 
 INSERT INTO users(first_name, last_name, username, password) values('Test1', 'Test2', 'Testa@a.com', 'pass');
+
+
+PGUSER=thabes PGHOST=localhost PGPASSWORD=thabes PGDATABASE=api PGPORT=5432 SERVERPORT=8080
+
+
+
+
+CREATE TABLE public.users (
+	id bigserial NOT NULL,
+	first_name varchar(30) NOT NULL,
+	last_name varchar(30) NOT NULL,
+	username varchar(50) NOT NULL,
+	"password" varchar(72) NOT NULL,
+	account_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	account_updated timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	CONSTRAINT users_pkey PRIMARY KEY (username)
+);
+
+-- Table Triggers
+
+create trigger update_user_task_updated_on before
+update
+    on
+    public.users for each row execute function update_updated_on_user_task();

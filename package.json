@@ -15,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "babel-register": "^6.26.0",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
@@ -23,9 +24,12 @@
     "joi": "^17.7.0",
     "lodash": "^4.17.21",
     "nodemon": "^2.0.20",
-    "pg": "^8.0.3",
+    "pg": "^8.9.0",
+    "pg-hstore": "^2.3.4",
     "postgres-pool": "^6.0.8",
-    "save-dev": "^0.0.1-security"
+    "save-dev": "^0.0.1-security",
+    "sequelize": "^6.28.0",
+    "sequelize-cli": "^6.6.0"
   },
   "devDependencies": {
     "jest": "^29.4.1",
