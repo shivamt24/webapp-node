@@ -48,7 +48,7 @@ const fetchProductById = async (_id) => {
         }
     });
     if (product.length === 0) {
-        throw new AppError(httpStatus.BAD_REQUEST, `Error: The product with id: ${_id} does not exists`);
+        throw new AppError("404", `Error: The product with id: ${_id} does not exists`);
     }
     return product[0].dataValues;
     //const product = await db.query(`SELECT * FROM products where id=${_id}`);
@@ -79,12 +79,15 @@ const updateProduct = async (_id, _authUser, productInfo) => {
     // });
 
     const product = await db.query(`SELECT * FROM products where id=${_id}`);
+    if (product.rowCount === 0) {
+        throw new AppError("404", `Error: The product with id: ${_id} does not exists`);
+    }
     const check = await db.query(`SELECT * FROM products where sku='${productInfo.sku}'`);
     if (check.rowCount !== 0 && +product.rows[0].id !== +check.rows[0].id) {
         throw new AppError(httpStatus.BAD_REQUEST, `Error: The product with sku is not unique`);
     }
     if (product.rowCount === 0) {
-        throw new AppError(httpStatus.BAD_REQUEST, `Error: The product with id: ${_id} does not exists`);
+        throw new AppError("404", `Error: The product with id: ${_id} does not exists`);
     }
     //_authUser.rows[0].id
     if (+product.rows[0].owner_user_id !== +_authUser[0].dataValues.id) {
@@ -107,7 +110,7 @@ const deleteProduct = async (_authUser, _id) => {
         }
     });
     if (product.length === 0) {
-        throw new AppError(httpStatus.BAD_REQUEST, `Error: The product with id: ${_id} does not exists`);
+        throw new AppError("404", `Error: The product with id: ${_id} does not exists`);
     }
     if (+product[0].dataValues.owner_user_id !== +_authUser[0].dataValues.id) {
         throw new AppError(httpStatus.FORBIDDEN, `Error: The User is forbidden to delete product with ID: ${_id}`);
