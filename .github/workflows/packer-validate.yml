@@ -24,6 +24,10 @@ jobs:
         with:
           version: "latest"
 
+      - name: Compress codebase
+        id: tarFile
+        run: touch webapp.tar.gz
+
       - name: Run `packer init`
         id: init
         run: "packer init scripts/aws-ami.pkr.hcl"
