@@ -26,7 +26,7 @@ jobs:
 
       - name: Compress codebase
         id: tarFile
-        run: touch webapp.tar.gz
+        run: touch webapp1.tar.gz
 
       - name: Run `packer init`
         id: init
