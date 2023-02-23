@@ -22,6 +22,25 @@ variable "ami_users" {
   type = list(string)
   default = ["583308812088"]
 }
+variable "instance_type"{
+  type = string
+  default = "t2.micro"
+}
+
+variable "device_name" {
+  type = string
+  default = "/dev/xvda"
+}
+
+variable "volume_size" {
+  type = number
+  default = 8
+}
+
+variable "volume_type" {
+  type = string
+  default = "gp2"
+}
 
 source "amazon-ebs" "my-ami" {
   region          = "${var.aws_region}"
@@ -37,16 +56,16 @@ source "amazon-ebs" "my-ami" {
     max_attempts  = 50
   }
 
-  instance_type = "t2.micro"
+  instance_type = "${var.instance_type}"
   source_ami    = "${var.source_ami}"
   ssh_username  = "${var.ssh_username}"
   subnet_id     = "${var.subnet_id}"
 
   launch_block_device_mappings {
     delete_on_termination = true
-    device_name           = "/dev/xvda"
-    volume_size           = 8
-    volume_type           = "gp2"
+    device_name           = "${var.device_name}"
+    volume_size           = "${var.volume_size}"
+    volume_type           = "${var.volume_type}"
   }
 }
 
