@@ -19,27 +19,32 @@ variable "subnet_id" {
 }
 
 variable "ami_users" {
-  type = list(string)
+  type    = list(string)
   default = ["583308812088"]
 }
-variable "instance_type"{
-  type = string
+variable "instance_type" {
+  type    = string
   default = "t2.micro"
 }
 
 variable "device_name" {
-  type = string
+  type    = string
   default = "/dev/xvda"
 }
 
 variable "volume_size" {
-  type = number
+  type    = number
   default = 8
 }
 
 variable "volume_type" {
-  type = string
+  type    = string
   default = "gp2"
+}
+
+variable "aws_region_list" {
+  type    = list(string)
+  default = ["us-east-1"]
 }
 
 source "amazon-ebs" "my-ami" {
@@ -47,10 +52,8 @@ source "amazon-ebs" "my-ami" {
   ami_name        = "thabes-ami-${formatdate("YYYY-MM-DD-hhmmss", timestamp())}"
   ami_description = "assignment ami"
 
-  ami_regions = [
-    "${var.aws_region}"
-  ]
-  ami_users = "${var.ami_users}"
+  ami_regions = "${var.aws_region_list}"
+  ami_users   = "${var.ami_users}"
   aws_polling {
     delay_seconds = 120
     max_attempts  = 50
