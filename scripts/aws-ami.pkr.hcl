@@ -44,7 +44,7 @@ variable "volume_type" {
 
 variable "aws_region_list" {
   type    = list(string)
-  default = ["us-east-1", "us-west-1"]
+  default = ["us-east-1"]
 }
 
 source "amazon-ebs" "my-ami" {
@@ -52,8 +52,8 @@ source "amazon-ebs" "my-ami" {
   ami_name        = "thabes-ami-${formatdate("YYYY-MM-DD-hhmmss", timestamp())}"
   ami_description = "assignment ami"
 
-  ami_regions = "${var.aws_region_list}"
-  ami_users   = "${var.ami_users}"
+  ami_regions = var.aws_region_list
+  ami_users   = var.ami_users
   aws_polling {
     delay_seconds = 120
     max_attempts  = 50
