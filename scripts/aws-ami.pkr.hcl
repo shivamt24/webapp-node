@@ -44,7 +44,7 @@ variable "volume_type" {
 
 variable "aws_region_list" {
   type    = list(string)
-  default = ["us-east-1"]
+  default = ["us-east-1", "us-west-1"]
 }
 
 source "amazon-ebs" "my-ami" {
