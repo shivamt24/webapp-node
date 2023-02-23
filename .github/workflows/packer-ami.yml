@@ -37,4 +37,4 @@ jobs:
 
       - name: Build `packer build`
         id: build
-        run: "packer build scripts/aws-ami.pkr.hcl"
+        run: "packer build scripts/aws-ami.pkr.hcl -var-file=scripts/variables.auto.pkrvars.hcl "
