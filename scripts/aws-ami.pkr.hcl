@@ -54,7 +54,7 @@ build {
   sources = ["source.amazon-ebs.my-ami"]
 
   provisioner "file" {
-    source      = "../../webapp.tar.gz"
+    source      = "../webapp.tar.gz"
     destination = "/home/ec2-user/webapp.tar.gz"
   }
 
