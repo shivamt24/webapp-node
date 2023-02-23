@@ -33,7 +33,7 @@ jobs:
         run: "packer init scripts/aws-ami.pkr.hcl"
 
       - name: Run 'packer format'
-        id: packer format
+        id: packer-format
         run: "packer fmt scripts/aws-ami.pkr.hcl && packer fmt scripts/variables.auto.pkrvars.hcl"
 
       - name: Run `packer validate`
