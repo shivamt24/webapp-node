@@ -55,6 +55,7 @@ $$ language 'plpgsql';
 EOF
 
 echo sudo unzip webapp.zip
+mkdir webapp
 tar -xvf webapp.tar.gz -C webapp/
 
 
