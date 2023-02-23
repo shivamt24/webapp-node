@@ -26,4 +26,4 @@ volume_size = 8
 volume_type = "gp2"
 
 # List of AWS regions to use
-aws_region_list = ["us-east-1"]
+aws_region_list = ["us-east-1", "us-west-1"]
