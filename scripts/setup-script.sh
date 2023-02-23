@@ -55,7 +55,7 @@ $$ language 'plpgsql';
 EOF
 
 echo sudo unzip webapp.zip
-tar -xvf webapp.tar.gz
+tar -xvf webapp.tar.gz -C webapp/
 
 
 curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
