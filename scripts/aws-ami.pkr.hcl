@@ -70,7 +70,7 @@ source "amazon-ebs" "my-ami" {
     volume_size           = "${var.volume_size}"
     volume_type           = "${var.volume_type}"
   }
-}
+
 
 build {
   sources = ["source.amazon-ebs.my-ami"]
