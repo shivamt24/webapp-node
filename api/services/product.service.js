@@ -111,7 +111,21 @@ const updateProduct = async (_id, _authUser, productInfo) => {
 
     let query = updateProductByID(_id, productInfo);
     console.log(query);
-    const result = await db.query(query);
+    //const result = await db.query(query);
+    // const updateObject = {};
+    // Object.keys(productInfo).map((key) => {
+    //     key = key.trim();
+    //     let value = productInfo[key];
+    //     //updateObject.push(`${key} : '${userInfo[key]}'`)
+    //     updateObject[key.trim()] = value.trim();
+    // });
+    // console.log(updateObject);
+
+    const status = await Product.update(productInfo, {
+        where: {
+            id: _id
+        }
+    })
 
 
 

@@ -49,12 +49,12 @@ module.exports = {
       createdAt: 'account_created',
       updatedAt: 'account_updated'
     });
-    await queryInterface.sequelize.query(
-      `create trigger update_user_task_updated_on before
-      update
-          on
-          public.users for each row execute function update_updated_on_user_task();`
-    )
+    // await queryInterface.sequelize.query(
+    //   `create trigger update_user_task_updated_on before
+    //   update
+    //       on
+    //       public.users for each row execute function update_updated_on_user_task();`
+    // )
   },
 
   down: async (queryInterface, Sequelize) => {
