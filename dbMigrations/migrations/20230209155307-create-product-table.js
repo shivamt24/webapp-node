@@ -58,13 +58,13 @@ module.exports = {
       updatedAt: 'date_last_updated'
     });
 
-    await queryInterface.sequelize.query(
-      `CREATE TRIGGER update_updated_on_product_task
-      BEFORE UPDATE
-      ON
-      products
-      FOR EACH ROW
-      EXECUTE PROCEDURE update_updated_on_product_task();`);
+    // await queryInterface.sequelize.query(
+    //   `CREATE TRIGGER update_updated_on_product_task
+    //   BEFORE UPDATE
+    //   ON
+    //   products
+    //   FOR EACH ROW
+    //   EXECUTE PROCEDURE update_updated_on_product_task();`);
     // await queryInterface.sequelize.query(
     //   `CREATE FUNCTION update_updated_on_user_task()
     //   RETURNS TRIGGER AS $$

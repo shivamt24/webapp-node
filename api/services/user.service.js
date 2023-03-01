@@ -86,9 +86,26 @@ const updateUser = async (_id, _authUser, userInfo) => {
         }
 
         let query = updateUserByID(_id, userInfo);
-        const result = await db.query(query);
+        //const result = await db.query(query);
         console.log(query);
-        //return result;
+
+
+        const updateObject = {};
+        Object.keys(userInfo).map((key) => {
+            key = key.trim();
+            let value = userInfo[key];
+            //updateObject.push(`${key} : '${userInfo[key]}'`)
+            updateObject[key.trim()] = value.trim();
+        });
+        console.log(updateObject);
+
+        const status = await User.update(userInfo, {
+            where: {
+                id: _id
+            }
+        })
+
+        //return status;
     } else {
         throw new AppError(httpStatus.FORBIDDEN, `Error: The User is forbidden to modify ID: ${_id}`);
     }
