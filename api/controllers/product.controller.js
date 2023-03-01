@@ -33,9 +33,45 @@ const deleteProduct = catchAsync(async (req, res) => {
     responseHandler(res, status);
 });
 
+const getImageList = catchAsync(async (req, res) => {
+    const _productId = +req.params.productId;
+    const _authUser = req.user;
+    const status = await productService.getImageList(_authUser, _productId);
+    responseHandler(res, status);
+});
+
+const addImage = catchAsync(async (req, res) => {
+    const fileStream = req.files;
+    const fileObject = req.body;
+    const _productId = +req.params.productId;
+    const _authUser = req.user;
+    const status = await productService.addImage(_authUser, _productId, fileStream, fileObject);
+    responseHandler(res, status);
+});
+
+const getImageDetails = catchAsync(async (req, res) => {
+    const _productId = +req.params.productId;
+    const _imageId = +req.params.imageId;
+    const _authUser = req.user;
+    const status = await productService.getImageDetails(_authUser, _productId, _imageId);
+    responseHandler(res, status);
+});
+
+const deleteImage = catchAsync(async (req, res) => {
+    const _productId = +req.params.productId;
+    const _imageId = +req.params.imageId;
+    const _authUser = req.user;
+    const status = await productService.deleteImage(_authUser, _productId, _imageId);
+    responseHandler(res, status);
+});
+
 export default {
     fetchProductById,
     updateProduct,
     createProduct,
-    deleteProduct
+    deleteProduct,
+    getImageList,
+    addImage,
+    getImageDetails,
+    deleteImage
 };

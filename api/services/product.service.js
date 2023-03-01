@@ -4,7 +4,22 @@ import db from '../database/index.js';
 import bcrypt from 'bcrypt';
 import AppError from '../utils/AppError.js';
 import models from '../models/index.js';
+import {
+    v1 as uuidv1
+} from 'uuid';
+import {
+    S3,
+    ListBucketsCommand,
+    PutObjectCommand,
+    DeleteObjectCommand
+} from "@aws-sdk/client-s3";
+
 const Product = models.Product;
+const Image = models.Image;
+const BUCKET_NAME = "thabes3"
+const s3Client = new S3({
+    region: "us-east-1"
+});
 
 //sku is unique
 //
@@ -48,7 +63,7 @@ const fetchProductById = async (_id) => {
         }
     });
     if (product.length === 0) {
-        throw new AppError("404", `Error: The product with id: ${_id} does not exists`);
+        throw new AppError(404, `Error: The product with id: ${_id} does not exists`);
     }
     return product[0].dataValues;
     //const product = await db.query(`SELECT * FROM products where id=${_id}`);
@@ -80,14 +95,14 @@ const updateProduct = async (_id, _authUser, productInfo) => {
 
     const product = await db.query(`SELECT * FROM products where id=${_id}`);
     if (product.rowCount === 0) {
-        throw new AppError("404", `Error: The product with id: ${_id} does not exists`);
+        throw new AppError(404, `Error: The product with id: ${_id} does not exists`);
     }
     const check = await db.query(`SELECT * FROM products where sku='${productInfo.sku}'`);
     if (check.rowCount !== 0 && +product.rows[0].id !== +check.rows[0].id) {
         throw new AppError(httpStatus.BAD_REQUEST, `Error: The product with sku is not unique`);
     }
     if (product.rowCount === 0) {
-        throw new AppError("404", `Error: The product with id: ${_id} does not exists`);
+        throw new AppError(404, `Error: The product with id: ${_id} does not exists`);
     }
     //_authUser.rows[0].id
     if (+product.rows[0].owner_user_id !== +_authUser[0].dataValues.id) {
@@ -110,7 +125,7 @@ const deleteProduct = async (_authUser, _id) => {
         }
     });
     if (product.length === 0) {
-        throw new AppError("404", `Error: The product with id: ${_id} does not exists`);
+        throw new AppError(404, `Error: The product with id: ${_id} does not exists`);
     }
     if (+product[0].dataValues.owner_user_id !== +_authUser[0].dataValues.id) {
         throw new AppError(httpStatus.FORBIDDEN, `Error: The User is forbidden to delete product with ID: ${_id}`);
@@ -151,10 +166,105 @@ let updateProductByID = (id, cols) => {
     return query.join(' ');
 };
 
+const getImageList = async (_authUser, _productId) => {
+
+    const image = await Image.findAll({
+        where: {
+            product_id: _productId
+        }
+    });
+    if (image.length === 0) {
+        throw new AppError(404, `Error: The Image for the Product: ${_productId} does not exists`);
+    }
+    const data = image.map(i => i.dataValues);
+    return data;
+
+}
+
+const addImage = async (_authUser, _productId, fileStream, fileObject) => {
+    //TODO: Error handling
+    const s3_directory = uuidv1();
+    const fileName = fileObject.file.name;
+    const bucketParams = {
+        Bucket: BUCKET_NAME,
+        Key: `${s3_directory}/${fileName}`,
+        Body: fileStream.file
+    };
+    const data = await s3Client.send(new PutObjectCommand(bucketParams));
+    console.log(
+        "Successfully uploaded object: " +
+        bucketParams.Bucket +
+        "/" +
+        bucketParams.Key
+    );
+    //return data;
+
+    const image = await Image.create({
+        product_id: _productId,
+        file_name: fileName,
+        s3_bucket_path: `${s3_directory}/${fileName}`
+    });
+
+    return image.dataValues;
+
+}
+
+const getImageDetails = async (_authUser, _productId, _imageId) => {
+    const image = await Image.findAll({
+        where: {
+            image_id: _imageId,
+            product_id: _productId
+        }
+    });
+    if (image.length === 0) {
+        throw new AppError(404, `Error: The Image with id: ${_imageId} for the Product: ${_productId} does not exists`);
+    }
+
+    return image[0].dataValues;
+
+}
+
+const deleteImage = async (_authUser, _productId, _imageId) => {
+    const image = await Image.findAll({
+        where: {
+            image_id: _imageId,
+            product_id: _productId
+        }
+    });
+    if (image.length === 0) {
+        throw new AppError(404, `Error: The Image with id: ${_imageId} for the Product: ${_productId} does not exists`);
+    }
+    const image_key = image[0].dataValues.s3_bucket_path;
+    const bucketParams = {
+        Bucket: BUCKET_NAME,
+        Key: image_key
+    };
+    const data = await s3Client.send(new DeleteObjectCommand(bucketParams));
+    console.log(
+        "Successfully deleted object: " +
+        bucketParams.Bucket +
+        "/" +
+        bucketParams.Key
+    );
+    //return image[0].dataValues;
+
+    const status = await Image.destroy({
+        where: {
+            image_id: _imageId,
+            product_id: _productId
+        }
+    });
+
+}
+
 export default {
     createProduct,
     fetchProductById,
     updateProduct,
     updateProductByID,
-    deleteProduct
+    deleteProduct,
+    getImageList,
+    addImage,
+    getImageDetails,
+    deleteImage
 }
