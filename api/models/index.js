@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 
 import getProductModel from './product.model.js';
 import getUserModel from './user.model.js';
+import getImageModel from './image.model.js';
 
 
 // connect to postgres db
@@ -18,6 +19,7 @@ const sequelize = new Sequelize(
 const models = {
     Product: getProductModel(sequelize, Sequelize),
     User: getUserModel(sequelize, Sequelize),
+    Image: getImageModel(sequelize, Sequelize)
 };
 
 Object.keys(models).forEach((key) => {
