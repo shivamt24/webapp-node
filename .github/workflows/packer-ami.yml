@@ -37,4 +37,4 @@ jobs:
 
       - name: Build `packer build`
         id: build
-        run: "packer build scripts/aws-ami.pkr.hcl"
+        run: "packer build -var 'ami_users=[${{ secrets.DEMO_ACCOUNT_ID }}]' scripts/aws-ami.pkr.hcl"
