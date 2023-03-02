@@ -14,13 +14,13 @@ const updateUser = catchAsync(async (req, res) => {
     const userInfo = req.body;
     const _authUser = req.user;
     const updatedUserInfo = await userService.updateUser(_id, _authUser, userInfo);
-    responseHandler(res, updatedUserInfo);
+    responseHandler(res, updatedUserInfo, 204);
 });
 
 const createUser = catchAsync(async (req, res) => {
     const userInfo = req.body;
     const createdUser = await userService.createUser(userInfo);
-    responseHandler(res, createdUser);
+    responseHandler(res, createdUser, 201);
 });
 
 export default {

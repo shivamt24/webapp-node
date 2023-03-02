@@ -8,7 +8,7 @@ const Product = models.Product;
 const fetchProductById = catchAsync(async (req, res) => {
     const _id = +req.params.productId;
     const productInfo = await productService.fetchProductById(_id);
-    responseHandler(res, productInfo);
+    responseHandler(res, productInfo, 200);
 });
 
 const updateProduct = catchAsync(async (req, res) => {
@@ -16,14 +16,14 @@ const updateProduct = catchAsync(async (req, res) => {
     const productInfo = req.body;
     const _authUser = req.user;
     const updatedUserInfo = await productService.updateProduct(_id, _authUser, productInfo);
-    responseHandler(res, updatedUserInfo);
+    responseHandler(res, updatedUserInfo, 204);
 });
 
 const createProduct = catchAsync(async (req, res) => {
     const userInfo = req.body;
     const _authUser = req.user;
     const createdUser = await productService.createProduct(_authUser, userInfo);
-    responseHandler(res, createdUser);
+    responseHandler(res, createdUser, 201);
 });
 
 const deleteProduct = catchAsync(async (req, res) => {
@@ -46,7 +46,7 @@ const addImage = catchAsync(async (req, res) => {
     const _productId = +req.params.productId;
     const _authUser = req.user;
     const status = await productService.addImage(_authUser, _productId, fileStream, fileObject);
-    responseHandler(res, status);
+    responseHandler(res, status, 201);
 });
 
 const getImageDetails = catchAsync(async (req, res) => {
