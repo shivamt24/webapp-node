@@ -4,6 +4,8 @@ import db from '../database/index.js';
 import bcrypt from 'bcrypt';
 import AppError from '../utils/AppError.js';
 import models from '../models/index.js';
+import * as dotenv from 'dotenv';
+dotenv.config();
 import {
     v1 as uuidv1
 } from 'uuid';
@@ -16,9 +18,10 @@ import {
 
 const Product = models.Product;
 const Image = models.Image;
-const BUCKET_NAME = "thabes3"
+const BUCKET_NAME = process.env.S3_BUCKETNAME
+//const BUCKET_NAME = "thabes3";
 const s3Client = new S3({
-    region: "us-east-1"
+    region: process.env.AWS_REGION
 });
 
 //sku is unique
@@ -110,7 +113,7 @@ const updateProduct = async (_id, _authUser, productInfo) => {
     }
 
     let query = updateProductByID(_id, productInfo);
-    console.log(query);
+    //console.log(query);
     //const result = await db.query(query);
     // const updateObject = {};
     // Object.keys(productInfo).map((key) => {
@@ -143,6 +146,39 @@ const deleteProduct = async (_authUser, _id) => {
     }
     if (+product[0].dataValues.owner_user_id !== +_authUser[0].dataValues.id) {
         throw new AppError(httpStatus.FORBIDDEN, `Error: The User is forbidden to delete product with ID: ${_id}`);
+    }
+
+    const imageList = await Image.findAll({
+        where: {
+            product_id: _id
+        }
+    });
+
+    if (imageList.length > 0) {
+        //console.log(imageList);
+        await imageList.forEach(async element => {
+            const image_key = element.dataValues.s3_bucket_path;
+            const _imageId = element.dataValues.image_id;
+            const bucketParams = {
+                Bucket: BUCKET_NAME,
+                Key: image_key
+            };
+            const data = await s3Client.send(new DeleteObjectCommand(bucketParams));
+            console.log(
+                "Successfully deleted object: " +
+                bucketParams.Bucket +
+                "/" +
+                bucketParams.Key
+            );
+            //return image[0].dataValues;
+
+            const status = await Image.destroy({
+                where: {
+                    image_id: _imageId,
+                    product_id: _id
+                }
+            });
+        });
     }
 
     const status = await Product.destroy({
@@ -196,7 +232,27 @@ const getImageList = async (_authUser, _productId) => {
 }
 
 const addImage = async (_authUser, _productId, fileStream, fileObject) => {
-    //TODO: Error handling
+
+    const product = await db.query(`SELECT * FROM products where id=${_productId}`);
+    if (product.rowCount === 0) {
+        throw new AppError(404, `Error: The product with id: ${_productId} does not exists`);
+    }
+
+    //_authUser.rows[0].id
+    if (+product.rows[0].owner_user_id !== +_authUser[0].dataValues.id) {
+        throw new AppError(httpStatus.FORBIDDEN, `Error: The User is forbidden to update product with ID: ${_productId}`);
+    }
+
+    const validTypes = ["image/avif", "image/bmp", "image/gif", "image/jpeg", "image/png", "image/svg+xml", "image/webp", "image/vnd.microsoft.icon", "image/tiff"];
+
+    if (fileObject.file === undefined) {
+        throw new AppError(httpStatus.BAD_REQUEST, `Error: The input key for the image should be file`);
+    }
+
+    if (!_.includes(validTypes, fileObject.file.type)) {
+        throw new AppError(httpStatus.BAD_REQUEST, `Error: The input file type: ${fileObject.file.type} is not supported. Valid types are avif,bmp,gif,png,jpeg,webp,tiff`);
+    }
+
     const s3_directory = uuidv1();
     const fileName = fileObject.file.name;
     const bucketParams = {
@@ -224,6 +280,17 @@ const addImage = async (_authUser, _productId, fileStream, fileObject) => {
 }
 
 const getImageDetails = async (_authUser, _productId, _imageId) => {
+
+    const product = await db.query(`SELECT * FROM products where id=${_productId}`);
+    if (product.rowCount === 0) {
+        throw new AppError(404, `Error: The product with id: ${_productId} does not exists`);
+    }
+
+    //_authUser.rows[0].id
+    if (+product.rows[0].owner_user_id !== +_authUser[0].dataValues.id) {
+        throw new AppError(httpStatus.FORBIDDEN, `Error: The User is forbidden to update product with ID: ${_productId}`);
+    }
+
     const image = await Image.findAll({
         where: {
             image_id: _imageId,
@@ -239,6 +306,17 @@ const getImageDetails = async (_authUser, _productId, _imageId) => {
 }
 
 const deleteImage = async (_authUser, _productId, _imageId) => {
+
+    const product = await db.query(`SELECT * FROM products where id=${_productId}`);
+    if (product.rowCount === 0) {
+        throw new AppError(404, `Error: The product with id: ${_productId} does not exists`);
+    }
+
+    //_authUser.rows[0].id
+    if (+product.rows[0].owner_user_id !== +_authUser[0].dataValues.id) {
+        throw new AppError(httpStatus.FORBIDDEN, `Error: The User is forbidden to update product with ID: ${_productId}`);
+    }
+
     const image = await Image.findAll({
         where: {
             image_id: _imageId,
