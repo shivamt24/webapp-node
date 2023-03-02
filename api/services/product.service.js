@@ -218,6 +218,16 @@ let updateProductByID = (id, cols) => {
 
 const getImageList = async (_authUser, _productId) => {
 
+    const product = await db.query(`SELECT * FROM products where id=${_productId}`);
+    if (product.rowCount === 0) {
+        throw new AppError(404, `Error: The product with id: ${_productId} does not exists`);
+    }
+
+    //_authUser.rows[0].id
+    if (+product.rows[0].owner_user_id !== +_authUser[0].dataValues.id) {
+        throw new AppError(httpStatus.FORBIDDEN, `Error: The User is forbidden to update product with ID: ${_productId}`);
+    }
+
     const image = await Image.findAll({
         where: {
             product_id: _productId
