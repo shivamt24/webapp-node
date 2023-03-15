@@ -47,4 +47,4 @@ This is a Node.js project that uses a PostgreSQL database for data storage and r
    ```
    PGUSER=thabes PGHOST=localhost PGPASSWORD=thabes PGDATABASE=api PGPORT=5432 SERVERPORT=8080 npx sequelize-cli db:migrate
    ```
-   
+   ..
