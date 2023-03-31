@@ -4,9 +4,15 @@ import db from '../database/index.js';
 import bcrypt from 'bcrypt';
 import AppError from '../utils/AppError.js';
 import models from '../models/index.js';
+import Lynx from 'lynx';
+
 const User = models.User;
+//var metrics = new Lynx('localhost', 8125);
 
 const createUser = async (userInfo) => {
+    //var timer = metrics.createTimer('user.createUser.time', 0.1);
+    global.statsD.increment('createUser');
+
     if (_.isEmpty(userInfo)) {
         throw new AppError(httpStatus.NO_CONTENT, `Error: No content provided to update`);
     }
@@ -28,6 +34,9 @@ const createUser = async (userInfo) => {
         password: pass,
     });
     delete result.dataValues.password;
+
+    //metrics.increment('user.createUser');
+    //await timer.stop();
     return result.dataValues;
 
     // if (_.isEmpty(userInfo)) {
@@ -47,7 +56,7 @@ const createUser = async (userInfo) => {
 };
 
 const fetchUserById = async (_id, _authUser) => {
-
+    global.statsD.increment('getUser');
     if (+_id === +_authUser[0].dataValues.id) {
         const result = await User.findAll({
             attributes: {
@@ -57,6 +66,7 @@ const fetchUserById = async (_id, _authUser) => {
                 id: _id
             }
         });
+        //metrics.increment('user.getAllUser');
         return result[0].dataValues;
     } else {
         throw new AppError(httpStatus.FORBIDDEN, `Error: The User is forbidden to access ID: ${_id}`);
@@ -73,6 +83,7 @@ const fetchUserById = async (_id, _authUser) => {
 };
 
 const updateUser = async (_id, _authUser, userInfo) => {
+    global.statsD.increment('updateUser');
     //_authUser.rows[0].id
     if (+_id === +_authUser[0].dataValues.id) {
         if (_.isEmpty(userInfo)) {
@@ -104,7 +115,7 @@ const updateUser = async (_id, _authUser, userInfo) => {
                 id: _id
             }
         })
-
+        //metrics.increment('user.updateUser');
         //return status;
     } else {
         throw new AppError(httpStatus.FORBIDDEN, `Error: The User is forbidden to modify ID: ${_id}`);

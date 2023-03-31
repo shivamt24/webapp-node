@@ -3,7 +3,7 @@
 
 sudo yum -y update
 sudo yum -y upgrade
-
+sudo yum install amazon-cloudwatch-agent -y
 echo sudo unzip webapp.zip
 mkdir webapp
 tar -xvf webapp.tar.gz -C webapp/
@@ -47,6 +47,10 @@ sudo mv webApp.service /etc/systemd/system/webApp.service
 sudo systemctl daemon-reload
 sudo systemctl enable webApp
 sudo systemctl stop webApp
+
+sudo chown -R $(whoami) /home/ec2-user/webapp/node_modules
+sudo chown -R $(whoami) ~/.npm
+
 
 
 
