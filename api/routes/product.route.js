@@ -10,7 +10,7 @@ const router = express.Router();
 router.route('/:productId')
     .get(requestValidatorMiddleware(productValidations.fetchProductById), productController.fetchProductById)
     .put(requestValidatorMiddleware(productValidations.updateProductPut), authMiddleware(), productController.updateProduct)
-    .patch(requestValidatorMiddleware(productValidations.updateProductPatch), authMiddleware(), productController.updateProduct)
+    .patch(requestValidatorMiddleware(productValidations.updateProductPatch), authMiddleware(), productController.patchProduct)
     .delete(requestValidatorMiddleware(productValidations.deleteProduct), authMiddleware(), productController.deleteProduct);
 
 router.route('/:productId/image')

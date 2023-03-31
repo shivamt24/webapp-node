@@ -27,7 +27,7 @@ const s3Client = new S3({
 //sku is unique
 //
 const createProduct = async (_authUser, productInfo) => {
-
+    global.statsD.increment('createProduct');
     const productCheck = await Product.findAll({
         where: {
             sku: productInfo.sku
@@ -60,6 +60,7 @@ const createProduct = async (_authUser, productInfo) => {
 };
 
 const fetchProductById = async (_id) => {
+    global.statsD.increment('getProduct');
     const product = await Product.findAll({
         where: {
             id: _id
@@ -77,8 +78,18 @@ const fetchProductById = async (_id) => {
 
 };
 
-const updateProduct = async (_id, _authUser, productInfo) => {
+const patchProduct = async(_id, _authUser, productInfo) =>{
+    global.statsD.increment('patchProduct');
+    await updateProduct(_id, _authUser, productInfo);
+}
 
+const updateProductPre = async(_id, _authUser, productInfo) =>{
+    global.statsD.increment('updateProduct');
+    await updateProduct(_id, _authUser, productInfo);
+}
+
+const updateProduct = async (_id, _authUser, productInfo) => {
+    
     // const product = await Product.findAll({
     //     where: {
     //         id: _id
@@ -135,7 +146,7 @@ const updateProduct = async (_id, _authUser, productInfo) => {
 };
 
 const deleteProduct = async (_authUser, _id) => {
-
+    global.statsD.increment('deleteProduct');
     const product = await Product.findAll({
         where: {
             id: _id
@@ -217,7 +228,7 @@ let updateProductByID = (id, cols) => {
 };
 
 const getImageList = async (_authUser, _productId) => {
-
+    global.statsD.increment('getImageList');
     const product = await db.query(`SELECT * FROM products where id=${_productId}`);
     if (product.rowCount === 0) {
         throw new AppError(404, `Error: The product with id: ${_productId} does not exists`);
@@ -242,7 +253,7 @@ const getImageList = async (_authUser, _productId) => {
 }
 
 const addImage = async (_authUser, _productId, fileStream, fileObject) => {
-
+    global.statsD.increment('addImage');
     const product = await db.query(`SELECT * FROM products where id=${_productId}`);
     if (product.rowCount === 0) {
         throw new AppError(404, `Error: The product with id: ${_productId} does not exists`);
@@ -290,7 +301,7 @@ const addImage = async (_authUser, _productId, fileStream, fileObject) => {
 }
 
 const getImageDetails = async (_authUser, _productId, _imageId) => {
-
+    global.statsD.increment('getImageDetails');
     const product = await db.query(`SELECT * FROM products where id=${_productId}`);
     if (product.rowCount === 0) {
         throw new AppError(404, `Error: The product with id: ${_productId} does not exists`);
@@ -316,7 +327,7 @@ const getImageDetails = async (_authUser, _productId, _imageId) => {
 }
 
 const deleteImage = async (_authUser, _productId, _imageId) => {
-
+    global.statsD.increment('deleteImage');
     const product = await db.query(`SELECT * FROM products where id=${_productId}`);
     if (product.rowCount === 0) {
         throw new AppError(404, `Error: The product with id: ${_productId} does not exists`);
@@ -368,5 +379,7 @@ export default {
     getImageList,
     addImage,
     getImageDetails,
-    deleteImage
+    deleteImage,
+    updateProductPre,
+    patchProduct
 }

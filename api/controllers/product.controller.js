@@ -15,10 +15,17 @@ const updateProduct = catchAsync(async (req, res) => {
     const _id = +req.params.productId;
     const productInfo = req.body;
     const _authUser = req.user;
-    const updatedUserInfo = await productService.updateProduct(_id, _authUser, productInfo);
+    const updatedUserInfo = await productService.updateProductPre(_id, _authUser, productInfo);
     responseHandler(res, updatedUserInfo, 204);
 });
 
+const patchProduct = catchAsync(async (req, res) => {
+    const _id = +req.params.productId;
+    const productInfo = req.body;
+    const _authUser = req.user;
+    const updatedUserInfo = await productService.patchProduct(_id, _authUser, productInfo);
+    responseHandler(res, updatedUserInfo, 204);
+});
 const createProduct = catchAsync(async (req, res) => {
     const userInfo = req.body;
     const _authUser = req.user;
@@ -73,5 +80,6 @@ export default {
     getImageList,
     addImage,
     getImageDetails,
-    deleteImage
+    deleteImage,
+    patchProduct
 };
