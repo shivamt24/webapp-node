@@ -11,7 +11,7 @@ const User = models.User;
 
 const createUser = async (userInfo) => {
     //var timer = metrics.createTimer('user.createUser.time', 0.1);
-    global.statsD.increment('createUser');
+    //global.statsD.increment('createUser');
 
     if (_.isEmpty(userInfo)) {
         throw new AppError(httpStatus.NO_CONTENT, `Error: No content provided to update`);
@@ -56,7 +56,7 @@ const createUser = async (userInfo) => {
 };
 
 const fetchUserById = async (_id, _authUser) => {
-    global.statsD.increment('getUser');
+    //global.statsD.increment('getUser');
     if (+_id === +_authUser[0].dataValues.id) {
         const result = await User.findAll({
             attributes: {
@@ -83,7 +83,7 @@ const fetchUserById = async (_id, _authUser) => {
 };
 
 const updateUser = async (_id, _authUser, userInfo) => {
-    global.statsD.increment('updateUser');
+    //global.statsD.increment('updateUser');
     //_authUser.rows[0].id
     if (+_id === +_authUser[0].dataValues.id) {
         if (_.isEmpty(userInfo)) {
