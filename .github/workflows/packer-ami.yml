@@ -40,7 +40,7 @@ jobs:
         run: "packer build -var 'ami_users=[${{ secrets.DEMO_ACCOUNT_ID }}]' scripts/aws-ami.pkr.hcl"
       
       - name: Create new launch template version and refresh
-        id: build
+        id: deploy
         run: "scripts/deploy.sh"
 
 # aws ec2 describe-images --owners '390646828676' --filters 'Name=name,Values=thabes*' --query 'sort_by(Images, &CreationDate)[-1].[ImageId]' --output 'text' --profile prod
