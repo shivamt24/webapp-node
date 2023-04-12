@@ -41,7 +41,7 @@ jobs:
       
       - name: Create new launch template version and refresh
         id: deploy
-        run: "sudo scripts/deploy.sh"
+        run: sudo scripts/deploy.sh
 
 # aws ec2 describe-images --owners '390646828676' --filters 'Name=name,Values=thabes*' --query 'sort_by(Images, &CreationDate)[-1].[ImageId]' --output 'text' --profile prod
 # aws ec2 create-launch-template-version --launch-template-name 'asg_launch_config' --source-version '$Latest' --launch-template-data '{"ImageId":"ami-03e7c3d7ccb7d11da"}' --profile prod
