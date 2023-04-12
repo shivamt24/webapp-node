@@ -1,6 +1,6 @@
 name: Build custom AMI
 on:
-  pull_request:
+  push:
     branches: [ "main" ]
 
 jobs:
@@ -38,6 +38,13 @@ jobs:
       # - name: Build `packer build`
       #   id: build
       #   run: "packer build -var 'ami_users=[${{ secrets.DEMO_ACCOUNT_ID }}]' scripts/aws-ami.pkr.hcl"
+
+      - name: Reconfigure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{secrets.AWS_REGION}}
       
       - name: Create new launch template version and refresh
         id: deploy
