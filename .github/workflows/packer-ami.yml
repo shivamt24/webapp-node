@@ -1,6 +1,6 @@
 name: Build custom AMI
 on:
-  pull_request:
+  push:
     branches: [ "main" ]
 
 jobs:
@@ -35,9 +35,9 @@ jobs:
         id: validate
         run: "packer validate scripts/aws-ami.pkr.hcl"
 
-      # - name: Build `packer build`
-      #   id: build
-      #   run: "packer build -var 'ami_users=[${{ secrets.DEMO_ACCOUNT_ID }}]' scripts/aws-ami.pkr.hcl"
+      - name: Build `packer build`
+        id: build
+        run: "packer build -var 'ami_users=[${{ secrets.DEMO_ACCOUNT_ID }}]' scripts/aws-ami.pkr.hcl"
 
       - name: Reconfigure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -53,12 +53,3 @@ jobs:
           echo '"'$image_id'"'
           aws ec2 create-launch-template-version --launch-template-name '${{secrets.LAUNCH_TEMPLATE_NAME}}' --source-version '$Latest' --launch-template-data "{\"ImageId\":\"$image_id\"}"
           aws autoscaling start-instance-refresh --auto-scaling-group-name '${{secrets.SCALING_GROUP_NAME}}' --desired-configuration '{"LaunchTemplate": {"LaunchTemplateName": "${{secrets.LAUNCH_TEMPLATE_NAME}}", "Version": "$Latest" }}'
-
-# aws ec2 describe-images --owners '390646828676' --filters 'Name=name,Values=thabes*' --query 'sort_by(Images, &CreationDate)[-1].[ImageId]' --output 'text' --profile prod
-# aws ec2 create-launch-template-version --launch-template-name 'asg_launch_config' --source-version '$Latest' --launch-template-data '{"ImageId":"ami-03e7c3d7ccb7d11da"}' --profile prod
-# aws autoscaling start-instance-refresh --auto-scaling-group-name 'csye6225-asg-thabes' --profile prod 
-
-#image_id=$(aws ec2 describe-images --owners '390646828676' --filters 'Name=name,Values=thabes*' --query 'sort_by(Images, &CreationDate)[-1].[ImageId]' --output 'text' --profile prod) 
-#aws ec2 create-launch-template-version --launch-template-name 'asg_launch_config' --source-version '$Latest' --launch-template-data "{\"ImageId\":\"$image_id\"}" --profile prod
-# aws autoscaling start-instance-refresh --auto-scaling-group-name 'csye6225-asg-thabes' --profile prod 
-
