@@ -49,10 +49,10 @@ jobs:
       - name: Create new launch template version and refresh
         id: deploy
         run: |
-          image_id=$(aws ec2 describe-images --owners '390646828676' --filters 'Name=name,Values=thabes*' --query 'sort_by(Images, &CreationDate)[-1].[ImageId]' --output 'text')
+          image_id=$(aws ec2 describe-images --owners '${{ secrets.DEMO_ACCOUNT_ID }}' --filters 'Name=name,Values=${{secrets.AMI_REGEX}}' --query 'sort_by(Images, &CreationDate)[-1].[ImageId]' --output 'text')
           echo '"'$image_id'"'
-          aws ec2 create-launch-template-version --launch-template-name 'asg_launch_config' --source-version '$Latest' --launch-template-data "{\"ImageId\":\"$image_id\"}"
-          aws autoscaling start-instance-refresh --auto-scaling-group-name 'csye6225-asg-thabes' --desired-configuration '{"LaunchTemplate": {"LaunchTemplateName": "asg_launch_config", "Version": "$Latest" }}'
+          aws ec2 create-launch-template-version --launch-template-name '${{secrets.LAUNCH_TEMPLATE_NAME}}' --source-version '$Latest' --launch-template-data "{\"ImageId\":\"$image_id\"}"
+          aws autoscaling start-instance-refresh --auto-scaling-group-name '${{secrets.SCALING_GROUP_NAME}}' --desired-configuration '{"LaunchTemplate": {"LaunchTemplateName": "${{secrets.LAUNCH_TEMPLATE_NAME}}", "Version": "$Latest" }}'
 
 # aws ec2 describe-images --owners '390646828676' --filters 'Name=name,Values=thabes*' --query 'sort_by(Images, &CreationDate)[-1].[ImageId]' --output 'text' --profile prod
 # aws ec2 create-launch-template-version --launch-template-name 'asg_launch_config' --source-version '$Latest' --launch-template-data '{"ImageId":"ami-03e7c3d7ccb7d11da"}' --profile prod
