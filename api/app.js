@@ -27,6 +27,11 @@ app.get('/healthz', (req, res) => {
     res.status(200).send('Ok');
 });
 
+app.get('/healthzz', (req, res) => {
+    global.statsD.increment('healthCheck');
+    res.status(200).send('Ok Healthz');
+});
+
 //routes
 routes(app);
 app.use(errorLoggerMiddleware);
