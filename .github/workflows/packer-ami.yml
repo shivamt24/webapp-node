@@ -49,7 +49,7 @@ jobs:
       - name: Create new launch template version and refresh
         id: deploy
         run: |
-          image_id=$(aws ec2 describe-images --owners '${{ secrets.DEMO_ACCOUNT_ID }}' --filters "Name=name,Values='${{secrets.AMI_REGEX}}'" --query 'sort_by(Images, &CreationDate)[-1].[ImageId]' --output 'text')
+          image_id=$(aws ec2 describe-images --owners '${{ secrets.DEMO_ACCOUNT_ID }}' --filters 'Name=name,Values=${{secrets.AMI_REGEX}}' --query 'sort_by(Images, &CreationDate)[-1].[ImageId]' --output 'text')
           echo '"'$image_id'"'
           aws ec2 create-launch-template-version --launch-template-name '${{secrets.LAUNCH_TEMPLATE_NAME}}' --source-version '$Latest' --launch-template-data "{\"ImageId\":\"$image_id\"}"
           aws autoscaling start-instance-refresh --auto-scaling-group-name '${{secrets.SCALING_GROUP_NAME}}' --desired-configuration '{"LaunchTemplate": {"LaunchTemplateName": "${{secrets.LAUNCH_TEMPLATE_NAME}}", "Version": "$Latest" }}'
