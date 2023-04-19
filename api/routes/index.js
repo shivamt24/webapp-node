@@ -3,11 +3,11 @@ import ProductRoute from './product.route.js';
 
 
 const appRoutes = [{
-        path: '/v1/user',
+        path: '/v2/user',
         route: UserRoute,
     },
     {
-        path: '/v1/product',
+        path: '/v2/product',
         route: ProductRoute,
     },
 ];
